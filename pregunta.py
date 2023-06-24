@@ -47,7 +47,7 @@ def ingest_data():
                     cluster = elements[0]
                     cantidad = elements[1]
                     porcentaje = elements[2].replace(',', '.')
-                    palabras_clave = ' '.join(elements[4:]).replace(',', ', ')
+                    palabras_clave = ' '.join(elements[4:])
 
                     # Agregar los valores a las listas correspondientes
                     cluster_list.append(cluster)
@@ -75,6 +75,8 @@ def ingest_data():
     }
 
     df = pd.DataFrame(data)
+    df['cantidad_de_palabras_clave'] = pd.to_numeric(df['cantidad_de_palabras_clave'])
+    df['porcentaje_de_palabras_clave'] = pd.to_numeric(df['porcentaje_de_palabras_clave'])
     
     return df
 
