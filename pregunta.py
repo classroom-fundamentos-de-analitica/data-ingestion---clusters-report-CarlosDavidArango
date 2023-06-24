@@ -47,7 +47,7 @@ def ingest_data():
                     cluster = elements[0]
                     cantidad = elements[1]
                     porcentaje = elements[2].replace(',', '.')
-                    palabras_clave = ' '.join(elements[4:])
+                    palabras_clave = ' '.join(elements[4:]).replace('.', '')
 
                     # Agregar los valores a las listas correspondientes
                     cluster_list.append(cluster)
@@ -80,4 +80,3 @@ def ingest_data():
     
     return df
 
-print(ingest_data())
