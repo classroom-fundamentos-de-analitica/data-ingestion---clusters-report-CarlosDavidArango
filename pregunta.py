@@ -10,36 +10,72 @@ espacio entre palabra y palabra.
 
 """
 import pandas as pd
-
+import re
 
 def ingest_data():
 
+    # Leer el archivo de texto
     with open('clusters_report.txt', 'r') as file:
         lines = file.readlines()
 
-    # Eliminar las líneas en blanco y las líneas de separación
-    lines = [line.strip() for line in lines if line.strip() != '' and not line.startswith('-')]
+    # Crear una lista para almacenar los datos de cada columna
+    cluster_list = []
+    cantidad_list = []
+    porcentaje_list = []
+    palabras_clave_list = []
 
-    # Crear un diccionario con las columnas del DataFrame
-    columns = ['Cluster', 'Cantidad_de_palabras_clave', 'Porcentaje_de_palabras_clave', 'Principales_palabras_clave']
-    data_dict = {column: [] for column in columns}
+    # Variables auxiliares para construir una línea completa
+    current_line = ''
+    is_complete_line = False
+    lineNumber = 1
 
-    # Agregar los datos al diccionario
+    # Iterar sobre las líneas del archivo
     for line in lines:
-        values = line.split(maxsplit=3)
-        if len(values) == 4:
-            for i, value in enumerate(values):
-                if i == 3:
-                    keywords = value.split(', ')
-                    data_dict[columns[i]].append(keywords)
-                else:
-                    data_dict[columns[i]].append(value)
 
-    # Crear el DataFrame a partir del diccionario
-    df = pd.DataFrame(data_dict)
+        if lineNumber >= 5:
+            # Limpiar la línea de espacios en blanco al principio y al final
+            line = line.strip()
 
-    # Reemplazar los espacios por guiones bajos en los nombres de las columnas
-    df.columns = df.columns.str.replace(' ', '_').str.lower()
+            # Verificar si la línea está vacía
+            if not line:
+                # Verificar si se completó una línea antes de la línea en blanco
+                if is_complete_line:
+                    # Separar los elementos de cada línea por espacios en blanco
+                    elements = current_line.strip().split()
+
+                    # Obtener los valores de cada columna
+                    cluster = elements[0]
+                    cantidad = elements[1]
+                    porcentaje = elements[2].replace(',', '.')
+                    palabras_clave = ' '.join(elements[4:]).replace(',', ', ')
+
+                    # Agregar los valores a las listas correspondientes
+                    cluster_list.append(cluster)
+                    cantidad_list.append(cantidad)
+                    porcentaje_list.append(porcentaje)
+                    palabras_clave_list.append(palabras_clave)
+
+                # Reiniciar la línea actual para la siguiente iteración
+                current_line = ''
+                is_complete_line = False
+                continue
+
+            # Construir la línea completa concatenando las líneas parciales
+            current_line += line + ' '
+            is_complete_line = True
+        
+        lineNumber += 1
+
+    # Crear el dataframe de Pandas
+    data = {
+        'cluster': cluster_list,
+        'cantidad_de_palabras_clave': cantidad_list,
+        'porcentaje_de_palabras_clave': porcentaje_list,
+        'principales_palabras_clave': palabras_clave_list
+    }
+
+    df = pd.DataFrame(data)
+    
     return df
 
-#print(ingest_data())
+print(ingest_data())
