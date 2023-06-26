@@ -77,7 +77,7 @@ def ingest_data():
     df = pd.DataFrame(data)
     df['cantidad_de_palabras_clave'] = pd.to_numeric(df['cantidad_de_palabras_clave'])
     df['porcentaje_de_palabras_clave'] = pd.to_numeric(df['porcentaje_de_palabras_clave'])
-    df['cluster'] = df['cluster'].astype(str)
+    df['cluster'] = pd.to_numeric(df['cluster'])
     
     return df
 
